@@ -1,12 +1,12 @@
 const express = require("express");
 const connectDB = require("./db");
 const User = require("./models/User");
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
 // middleware
 const app = express();
 app.use(express.json());
 
-app.post("/register", async (req, res) => {
+app.post("/register", async (req, res,next) => {
   /**
    * Request input sources:
    * - req body
@@ -14,26 +14,34 @@ app.post("/register", async (req, res) => {
    * - req header
    * - req cookies
    */
-  const { name, email, password } = req?.body;
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "invalid" });
+  try {
+    const { name, email, password } = req?.body;
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: "invalid" });
+    }
+    // exec() use to if you find any error in your function
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: "user already exist" });
+    }
+    user = new User({
+      name,
+      email,
+      password,
+    });
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    user.password = hash;
+    await user.save();
+    return res.status(201).json({ message: "user created successfully", user });
+  } catch (e) {
+    next(e)
   }
-  // exec() use to if you find any error in your function
-  let user = await User.findOne({ email });
-  if (user) {
-    return res.status(400).json({ message: "user already exist" });
-  }
-  user = new User({
-    name,
-    email,
-    password,
-  });
-  const salt = await bcrypt.genSalt(10)
-  const hash = await bcrypt.hash(password,salt)
-  user.password = hash
-  await user.save();
-  return res.status(201).json({ message: "user created successfully", user });
 });
+
+app.use((err,_req,res,_next) => {
+  res.status(500).json({message: "Internal server errors",err: err.errors})
+})
 
 app.get("/", (_req, res) => {
   const obj = {

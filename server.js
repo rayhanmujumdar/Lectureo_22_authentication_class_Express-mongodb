@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const app = express();
 app.use(express.json());
 
-app.post("/register", async (req, res,next) => {
+app.post("/register", async (req, res, next) => {
   /**
    * Request input sources:
    * - req body
@@ -35,13 +35,51 @@ app.post("/register", async (req, res,next) => {
     await user.save();
     return res.status(201).json({ message: "user created successfully", user });
   } catch (e) {
-    next(e)
+    next(e);
   }
 });
 
-app.use((err,_req,res,_next) => {
-  res.status(500).json({message: "Internal server errors",err: err.errors})
-})
+app.post("/login", async (req, res) => {
+  /* 
+    email = input
+    password = input
+    user = find user with email
+    if user not found
+    return 400 error
+    if password not equal to user.hash
+    return 400 error 
+    token = generate token using user
+    return token
+    end
+  */
+
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      return res.status(400).json({
+        message: "user not find",
+      });
+    }
+    // const method = Object.getOwnPropertyNames(user)
+    const isUserPass = await bcrypt.compare(password, user.password);
+    if (!isUserPass) {
+      return res.status(400).json({ message: "Password is not matching" });
+    }
+    delete user._doc.password;
+    // TODO: generator jwt token
+    res.status(201).json({
+      message: "success",
+      user,
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.use((err, _req, res, _next) => {
+  res.status(500).json({ message: "Internal server errors", err: err.errors });
+});
 
 app.get("/", (_req, res) => {
   const obj = {

@@ -1,10 +1,14 @@
+require("dotenv").config();
 const express = require("express");
 const connectDB = require("./db");
 const User = require("./models/User");
 const bcrypt = require("bcrypt");
+const {verifyToken} = require('./middleware/authenticate')
 // middleware
 const app = express();
 app.use(express.json());
+
+// token middleware
 
 app.post("/register", async (req, res, next) => {
   /**
@@ -39,7 +43,7 @@ app.post("/register", async (req, res, next) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", async (req, res, next) => {
   /* 
     email = input
     password = input
@@ -67,18 +71,39 @@ app.post("/login", async (req, res) => {
       return res.status(400).json({ message: "Password is not matching" });
     }
     delete user._doc.password;
-    // TODO: generator jwt token
+    const token = jwt.sign(user._doc, process.env.SECRET_KEY, {
+      expiresIn: "2h",
+    });
+    console.log(token);
     res.status(201).json({
       message: "success",
-      user,
+      token,
     });
   } catch (e) {
+    console.log(e);
     next(e);
   }
 });
 
+app.get("/private", verifyToken, async (req, res, next) => {
+  console.log(req.decoded)
+  try{
+    const user = req.decoded
+    const findUser = await User.findById(user._id)
+    if(findUser){
+      return res.status(200).json({ message: "This is my private route" });
+    }
+  }catch(e){
+    // next(e)
+  }
+});
+
+app.post("/public", (req, res) => {
+  return res.status(200).json({ message: "This is my public route" });
+});
+
 app.use((err, _req, res, _next) => {
-  res.status(500).json({ message: "Internal server errors", err: err.errors });
+  res.status(500).json({ message: "Internal server errors"});
 });
 
 app.get("/", (_req, res) => {

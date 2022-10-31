@@ -2,91 +2,17 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./db");
 const User = require("./models/User");
-const bcrypt = require("bcrypt");
 const {verifyToken} = require('./middleware/authenticate')
+const routes = require('./routes/index')
 // middleware
 const app = express();
 app.use(express.json());
+app.use(routes)
 
 // token middleware
 
-app.post("/register", async (req, res, next) => {
-  /**
-   * Request input sources:
-   * - req body
-   * - req params
-   * - req header
-   * - req cookies
-   */
-  try {
-    const { name, email, password } = req?.body;
-    if (!name || !email || !password) {
-      return res.status(400).json({ message: "invalid" });
-    }
-    // exec() use to if you find any error in your function
-    let user = await User.findOne({ email });
-    if (user) {
-      return res.status(400).json({ message: "user already exist" });
-    }
-    user = new User({
-      name,
-      email,
-      password,
-    });
-    const salt = await bcrypt.genSalt(10);
-    const hash = await bcrypt.hash(password, salt);
-    user.password = hash;
-    await user.save();
-    return res.status(201).json({ message: "user created successfully", user });
-  } catch (e) {
-    next(e);
-  }
-});
-
-app.post("/login", async (req, res, next) => {
-  /* 
-    email = input
-    password = input
-    user = find user with email
-    if user not found
-    return 400 error
-    if password not equal to user.hash
-    return 400 error 
-    token = generate token using user
-    return token
-    end
-  */
-
-  try {
-    const { email, password } = req.body;
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      return res.status(400).json({
-        message: "user not find",
-      });
-    }
-    // const method = Object.getOwnPropertyNames(user)
-    const isUserPass = await bcrypt.compare(password, user.password);
-    if (!isUserPass) {
-      return res.status(400).json({ message: "Password is not matching" });
-    }
-    delete user._doc.password;
-    const token = jwt.sign(user._doc, process.env.SECRET_KEY, {
-      expiresIn: "2h",
-    });
-    console.log(token);
-    res.status(201).json({
-      message: "success",
-      token,
-    });
-  } catch (e) {
-    console.log(e);
-    next(e);
-  }
-});
 
 app.get("/private", verifyToken, async (req, res, next) => {
-  console.log(req.decoded)
   try{
     const user = req.decoded
     const findUser = await User.findById(user._id)

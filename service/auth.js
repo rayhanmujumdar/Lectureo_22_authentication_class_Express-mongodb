@@ -1,5 +1,5 @@
 const {findUserByProperty,createNewUser} = require('./user')
-const {errorService} = require('./error')
+const {error} = require('../utils/error')
 const User = require("../models/User")
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken")
@@ -18,12 +18,12 @@ exports.registerService = async ({ name, email, password }) => {
 exports.loginService = async ({ email, password }) => {
   const user = await User.findOne({ email: email });
   if (!user) {
-    throw errorService(400,"user not found")
+    throw error(400,"user not found")
   }
   // const method = Object.getOwnPropertyNames(user)
   const isUserPass = await bcrypt.compare(password, user.password);
   if (!isUserPass) {
-    throw errorService(400,"Password not match")
+    throw error(400,"Password not match")
   }
   const playLoad = {
     _id: user._id,

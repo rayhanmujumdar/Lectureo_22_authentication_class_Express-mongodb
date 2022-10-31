@@ -29,7 +29,9 @@ app.post("/public", (req, res) => {
 });
 
 app.use((err, _req, res, _next) => {
-  res.status(500).json({ message: "Internal server errors"});
+  const message = err.message ? err.message : "Internal server errors"
+  const status = err.status ? err.status : 500
+  res.status(status).json({message});
 });
 
 app.get("/", (_req, res) => {

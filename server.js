@@ -2,13 +2,14 @@ require("dotenv").config();
 const express = require("express");
 const connectDB = require("./db");
 const User = require("./models/User");
-const {verifyToken} = require('./middleware/authenticate')
+const verifyToken = require('./middleware/authenticate')
 const routes = require('./routes/index')
+const morgan = require('morgan')
 // middleware
 const app = express();
 app.use(express.json());
 app.use(routes)
-
+app.use(morgan('dev'))
 // token middleware
 
 
@@ -20,7 +21,7 @@ app.get("/private", verifyToken, async (req, res, next) => {
       return res.status(200).json({ message: "This is my private route" });
     }
   }catch(e){
-    // next(e)
+    next(e)
   }
 });
 
@@ -44,6 +45,7 @@ app.get("/", (_req, res) => {
 
 connectDB("mongodb://localhost:27017/attendance-db")
   .then(() => {
+    console.log("Database connected")
     app.listen(4000, () => {
       console.log("I am listening on port 4000");
     });

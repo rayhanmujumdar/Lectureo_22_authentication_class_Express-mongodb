@@ -1,4 +1,5 @@
 const router = require('express').Router()
+const usersController = require('../controllers/user')
 
 /**
  * user find by id
@@ -38,7 +39,7 @@ router.delete('/:userId',() => {})
  * @method GET
  */
 
-router.get('/',() => {})
+router.get('/',usersController.getUsers)
 
 /**
  * create a new users

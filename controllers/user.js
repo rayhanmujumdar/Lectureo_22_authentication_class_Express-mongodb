@@ -42,6 +42,20 @@ exports.createUser = async (req,res,next) => {
     }
 }
 
+exports.PutUserById = async (req,res,next) => {
+    const {name,email,roles,accountStatus} = req.body
+    const {userId} = req.params
+    try{
+        const user = await userService.updateUserById(userId,{name,email,roles,accountStatus})
+        if(!user){
+            throw error(404,"User Not Found")
+        }
+        res.status(203).json(user)
+    }catch(err){
+        next(err)
+    }
+}
+
 exports.updateUserById = async (req,res,next) => {
     const {name,roles,accountStatus} = req.body
     const {userId} = req.params

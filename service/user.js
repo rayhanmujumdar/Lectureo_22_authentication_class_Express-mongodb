@@ -1,5 +1,5 @@
 const User = require("../models/User");
-
+const error = require('../utils/error')
 const findUsers = () => {
   return User.find();
 };
@@ -22,8 +22,18 @@ const createNewUser = ({ name, email, password, roles, accountStatus }) => {
   return user.save();
 };
 
+const updateUserById = async (id,data) => {
+  console.log(data.email)
+  const user = await findUserByProperty('email',data?.email)
+  console.log(user)
+  if(user){
+    throw error(400,"User already exist")
+  }
+  return User.findByIdAndUpdate(id,{...data},{new: true})
+}
 module.exports = {
   findUserByProperty,
   createNewUser,
   findUsers,
+  updateUserById
 };

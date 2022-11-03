@@ -16,6 +16,16 @@ router.get('/:userId',usersController.getUserById)
  * @api api/v1/users/:userID
  * @apiDescription find user to db and then update and then another set to DB
  * @visibility Private
+ * @method PUT
+ */
+
+router.put('/:userId',usersController.PutUserById)
+
+/**
+ * Update user
+ * @api api/v1/users/:userID
+ * @apiDescription find user to db and then update and then another set to DB
+ * @visibility Private
  * @method PATCH
  */
 

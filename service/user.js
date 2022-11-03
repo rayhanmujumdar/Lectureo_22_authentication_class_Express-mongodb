@@ -23,9 +23,10 @@ const createNewUser = ({ name, email, password, roles, accountStatus }) => {
 };
 
 const updateUserById = async (id,data) => {
-  console.log(data.email)
-  const user = await findUserByProperty('email',data?.email)
-  console.log(user)
+  let user;
+  if(data.email){
+    user = await findUserByProperty('email',data?.email)
+  }
   if(user){
     throw error(400,"User already exist")
   }

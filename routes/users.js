@@ -19,7 +19,7 @@ router.get('/:userId',usersController.getUserById)
  * @method PATCH
  */
 
-router.patch('/:userId',() => {})
+router.patch('/:userId',usersController.updateUserById)
 
 /**
  * Delete user
@@ -29,7 +29,7 @@ router.patch('/:userId',() => {})
  * @method DELETE
  */
 
-router.delete('/:userId',() => {})
+router.delete('/:userId',usersController.deleteUserById)
 
 /**
  * find all users

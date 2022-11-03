@@ -17,7 +17,7 @@ exports.getUsers = async (_req, res, next) => {
 };
 
 exports.getUserById = async (req, res, next) => {
-    const userId = req.params.userId
+    const {userId} = req.params
     try{
         const user = await userService.findUserByProperty('_id',userId)
         if(!user){
@@ -42,6 +42,42 @@ exports.createUser = async (req,res,next) => {
     }
 }
 
-exports.updateUserById = (req,res,next) => {}
+exports.updateUserById = async (req,res,next) => {
+    const {name,roles,accountStatus} = req.body
+    const {userId} = req.params
+    try{
+        const user = await userService.findUserByProperty("_id",userId)
+        if(!user){
+            throw error(404,"User Not Found")
+        }
+        user.name = name ?? user.name
+        user.roles = roles ?? user.roles
+        user.accountStatus = accountStatus ?? user.accountStatus
+        await user.save()
+        return res.status(200).json(user)
+    }catch(err){
+        next(err)
+    }
+}
 
-exports.deleteUserById = (req,res,next) => {}
+exports.deleteUserById = async (req,res,next) => {
+    // find user by id
+    // if user not found
+    // return an error msg (user not found) → status code is = 400
+    // else
+    // Delete user in DB
+    // delete all associated data
+    // status code = 203
+    const {userId} = req.params
+    try{
+        const user = await userService.findUserByProperty("_id",userId)
+        if(!user){
+            throw error(404,"User Not find")
+        }
+        console.log(await user.save())
+        // await user.remove()
+        res.status(203).json()
+    }catch(err){
+        next(err)
+    }
+}

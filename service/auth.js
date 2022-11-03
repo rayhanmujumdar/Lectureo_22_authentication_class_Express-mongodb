@@ -4,6 +4,7 @@ const User = require("../models/User")
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken")
 exports.registerService = async ({ name, email, password,roles,accountStatus }) => {
+  console.log(name,email,password,roles,accountStatus)
   let user = await findUserByProperty("email",email)
   if (user) {
     const err = new Error('user already exist')
@@ -12,6 +13,7 @@ exports.registerService = async ({ name, email, password,roles,accountStatus }) 
   }
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
+  console.log(hash)
   return createNewUser({name,email,password: hash,roles,accountStatus})
 };
 

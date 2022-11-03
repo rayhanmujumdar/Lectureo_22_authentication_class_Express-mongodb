@@ -9,7 +9,7 @@ const usersController = require('../controllers/user')
  * @method GET
  */
 
-router.get('/:userId',() => {})
+router.get('/:userId',usersController.getUserById)
 
 /**
  * Update user
@@ -42,7 +42,7 @@ router.delete('/:userId',() => {})
 router.get('/',usersController.getUsers)
 
 /**
- * create a new users
+ * TODO: create a new users
  * @api api/v1/users
  * @apiDescription create a new user and then set to DB
  * @visibility private

@@ -15,7 +15,18 @@ exports.getUsers = async (_req, res, next) => {
     }
 };
 
-exports.getUserById = (req, res, next) => {};
+exports.getUserById = async (req, res, next) => {
+    const userId = req.params.userId
+    try{
+        const user = await userService.findUserByProperty('_id',userId)
+        if(!user){
+            throw error(400,"User Not Found")
+        }
+        res.status(200).json(user)
+    }catch(err){
+        next(err)
+    }
+};
 
 exports.createUser = (req,res,next) => {}
 

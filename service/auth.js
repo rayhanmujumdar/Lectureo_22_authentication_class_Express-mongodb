@@ -3,7 +3,7 @@ const {error} = require('../utils/error')
 const User = require("../models/User")
 const bcrypt = require('bcrypt')
 const jwt = require("jsonwebtoken")
-exports.registerService = async ({ name, email, password }) => {
+exports.registerService = async ({ name, email, password,roles,accountStatus }) => {
   let user = await findUserByProperty("email",email)
   if (user) {
     const err = new Error('user already exist')
@@ -12,7 +12,7 @@ exports.registerService = async ({ name, email, password }) => {
   }
   const salt = await bcrypt.genSalt(10);
   const hash = await bcrypt.hash(password, salt);
-  return createNewUser({name,email,password: hash})
+  return createNewUser({name,email,password: hash,roles,accountStatus})
 };
 
 exports.loginService = async ({ email, password }) => {

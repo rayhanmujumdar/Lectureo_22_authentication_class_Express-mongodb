@@ -1,5 +1,6 @@
 const userService = require('../service/user');
 const error = require('../utils/error');
+const authService = require('../service/auth')
 exports.getUsers = async (_req, res, next) => {
     /**
      * TODO: filter,sort,pagination,select
@@ -28,7 +29,18 @@ exports.getUserById = async (req, res, next) => {
     }
 };
 
-exports.createUser = (req,res,next) => {}
+exports.createUser = async (req,res,next) => {
+    const {name,email,password,roles,accountStatus} = req.body
+    try{
+        const user = await authService.registerService({name,email,password,roles,accountStatus})
+        if(!user){
+            throw error(404,"User Not created")
+        }
+        res.status(201).json(user)
+    }catch(err){
+        next(err)
+    }
+}
 
 exports.updateUserById = (req,res,next) => {}
 

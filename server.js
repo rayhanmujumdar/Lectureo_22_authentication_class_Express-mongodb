@@ -1,6 +1,6 @@
 require("dotenv").config();
 const express = require("express");
-const connectDB = require("./db");
+const connectDB = require("./db/db");
 const User = require("./models/User");
 const verifyToken = require('./middleware/authenticate')
 const routes = require('./routes/index')

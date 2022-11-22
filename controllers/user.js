@@ -88,8 +88,8 @@ exports.deleteUserById = async (req,res,next) => {
         if(!user){
             throw error(404,"User Not find")
         }
-        console.log(await user.save())
-        // await user.remove()
+        // console.log(await user.save())
+        await user.remove()
         res.status(203).json()
     }catch(err){
         next(err)
